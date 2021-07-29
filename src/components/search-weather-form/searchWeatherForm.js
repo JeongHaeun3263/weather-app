@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, Router } from 'react-router-dom';
 
 import Result from '../display-weather/displayWeather';
 import { api } from '../../api';
@@ -16,6 +17,7 @@ const SearchWeatherForm = (props) => {
 	const [isZipCodeInputBoxVisible, setisZipCodeInputBoxVisible] =
 		useState(false);
 	const [loading, setLoading] = useState(false);
+	const [hasError, setHasError] = useState(false);
 
 	// comment out to check data format
 	// useEffect(() => {
@@ -34,7 +36,20 @@ const SearchWeatherForm = (props) => {
 		const sevenDaysData = await fetch(
 			`${api.base}onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly&appid=${api.key}`
 		) //
-			.then((res) => res.json());
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error();
+				}
+				return res;
+			})
+			.then((res) => {
+				console.log('ok');
+				return res.json();
+			})
+			.catch((error) => {
+				console.log(error);
+				setHasError(true);
+			});
 
 		setSevendaysWeatherData(sevenDaysData);
 		setLoading(false);
@@ -46,7 +61,20 @@ const SearchWeatherForm = (props) => {
 		const data = await fetch(
 			`${api.base}weather?q=${form.city}&appid=${api.key}`
 		) //
-			.then((res) => res.json());
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error();
+				}
+				return res;
+			})
+			.then((res) => {
+				console.log('ok');
+				return res.json();
+			})
+			.catch((error) => {
+				console.log(error);
+				setHasError(true);
+			});
 
 		setLoading(true);
 		setCurrentWeatherData(data);
@@ -59,7 +87,20 @@ const SearchWeatherForm = (props) => {
 		const data = await fetch(
 			`${api.base}weather?zip=${form.zipcode},${form.countrycode}&appid=${api.key}`
 		) //
-			.then((res) => res.json());
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error();
+				}
+				return res;
+			})
+			.then((res) => {
+				console.log('ok');
+				return res.json();
+			})
+			.catch((error) => {
+				console.log(error);
+				setHasError(true);
+			});
 
 		setLoading(true);
 		setCurrentWeatherData(data);
@@ -160,6 +201,14 @@ const SearchWeatherForm = (props) => {
 			</form>
 
 			{loading && <div className="loading"></div>}
+
+			{hasError && (
+				<button>
+					<Router>
+						<Link to="/">Try again</Link>
+					</Router>
+				</button>
+			)}
 
 			{sevendaysWeatherData && (
 				<Result
